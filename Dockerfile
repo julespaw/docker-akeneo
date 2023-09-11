@@ -1,10 +1,11 @@
 # refer to: https://github.com/chandrantwins/akeneo-docker/blob/master/Dockerfile
+# akeneo version: https://packagist.org/packages/akeneo/pim-community-standard
+# upgrade to: 7.0.22
 
-
-FROM akeneo/pim-php-dev:master
+FROM akeneo/pim-php-dev:8.1
 
 LABEL maintainer="help@websoft9.com"
-LABEL version="latest"
+LABEL version="7.0.22"
 LABEL description="Akeneo"
 
 ENV AKENEO_MYSQL_HOST=mysql
@@ -21,7 +22,7 @@ RUN apt clean && rm -rf /var/lib/apt/lists/*
 RUN a2enmod rewrite proxy_fcgi actions alias expires headers ssl
 ADD 000-default.conf /etc/apache2/sites-available/000-default.conf
 ADD entrypoint.sh /entrypoint.sh
-RUN chmod +x entrypoint.sh
+RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 
 
@@ -33,6 +34,8 @@ RUN COMPOSER_MEMORY_LIMIT=-1 composer create-project akeneo/pim-community-standa
 
 WORKDIR /var/www/html
 RUN chown -R www-data:www-data /var/www/html
+RUN yarn install
+RUN PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=1 yarnpkg packages:build
 
 EXPOSE 80
 
